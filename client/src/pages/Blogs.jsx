@@ -1,11 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@chakra-ui/react";
+import {
+  Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Input,
+  useDisclosure,
+  FormControl,
+  FormLabel,
+  Select,
+} from "@chakra-ui/react";
 export default function Blogs() {
-  let [blog, setBlog] = useState({ title: "", body: "" });
+  let [blog, setBlog] = useState({
+    first_name: "",
+    last_name: "",
+    blood_type: "",
+    condition: "",
+    patient_details: "",
+  });
   let [blogData, setBlogData] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [edit, setEdit] = useState(false);
   const [update, setUpdate] = useState({});
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const initialRef = React.useRef(null);
+  const finalRef = React.useRef(null);
   async function handleSubmit(event) {
     event.preventDefault();
     let res = await fetch(
@@ -21,9 +44,15 @@ export default function Blogs() {
     let data = await res.json();
     alert(data.msg);
     console.log(data.msg);
-    setBlog({ title: "", body: "" });
+    setBlog({
+      first_name: "",
+      last_name: "",
+      blood_type: "",
+      condition: "",
+      patient_details: "",
+    });
   }
-
+  console.log(blog);
   function handleChange(event) {
     setBlog({
       ...blog,
@@ -50,7 +79,7 @@ export default function Blogs() {
   async function handleDelete(id) {
     try {
       let res = await fetch(
-        `https://tiny-pink-eagle-cape.cyclic.app/blog/delete/${id}`,
+        `https://backendehr-production.up.railway.app/record/delete/${id}`,
         {
           method: "DELETE",
           mode: "cors",
@@ -70,8 +99,7 @@ export default function Blogs() {
     let selectedBlog = blogData.find((item) => item._id === id);
     setUpdate((prevValue) => ({
       ...prevValue,
-      title: selectedBlog.title,
-      body: selectedBlog.body,
+      patient_details: selectedBlog.patient_details,
     }));
   }
 
@@ -85,7 +113,7 @@ export default function Blogs() {
     try {
       console.log(update);
       let res = await fetch(
-        `https://tiny-pink-eagle-cape.cyclic.app/blog/update/${id}`,
+        `https://backendehr-production.up.railway.app/record/update/${id}`,
         {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -103,6 +131,9 @@ export default function Blogs() {
   }
   return (
     <>
+      <Button onClick={onOpen} m="1rem">
+        Add Patient
+      </Button>
       <h2
         style={{
           textAlign: "center",
@@ -113,57 +144,84 @@ export default function Blogs() {
       >
         RECORDS
       </h2>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <div
-          style={{
-            width: "35vw",
-            height: "30rem",
-            border: "1px solid black",
-            padding: "2rem",
-          }}
+      <>
+        <Modal
+          initialFocusRef={initialRef}
+          finalFocusRef={finalRef}
+          isOpen={isOpen}
+          onClose={onClose}
         >
-          <form onSubmit={handleSubmit}>
-            <input
-              style={{
-                margin: "10px",
-                height: "5vh",
-                width: "30vw",
-                textAlign: "center",
-              }}
-              placeholder="Enter name"
-              type="text"
-              name="title"
-              onChange={handleChange}
-            />
-            <br />
-            <input
-              style={{
-                margin: "10px",
-                height: "30vh",
-                width: "30vw",
-                textAlign: "center",
-              }}
-              placeholder="Enter details"
-              type="text"
-              name="body"
-              onChange={handleChange}
-            />
-            <br />
-            <input
-              style={{
-                margin: "10px",
-                padding: "10px",
-                width: "30vw",
-                cursor: "pointer",
-              }}
-              type="submit"
-            />
-          </form>
-        </div>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader m="auto">Add Patient Details</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={6}>
+              <form onSubmit={handleSubmit}>
+                <FormControl>
+                  <FormLabel>First name</FormLabel>
+                  <Input
+                    ref={initialRef}
+                    name="first_name"
+                    placeholder="First name"
+                    onChange={handleChange}
+                  />
+                </FormControl>
+
+                <FormControl mt={4}>
+                  <FormLabel>Last name</FormLabel>
+                  <Input
+                    onChange={handleChange}
+                    name="last_name"
+                    placeholder="Last name"
+                  />
+                </FormControl>
+                <FormControl mt={4}>
+                  <FormLabel>Blood Group</FormLabel>
+                  <Input
+                    onChange={handleChange}
+                    placeholder="blood group"
+                    name="blood_type"
+                  />
+                </FormControl>
+                <FormControl mt={4}>
+                  <FormLabel>Any Specific details</FormLabel>
+                  <Input
+                    onChange={handleChange}
+                    placeholder="condition details..."
+                    name="patient_details"
+                  />
+                </FormControl>
+                <FormControl mt={4}>
+                  <FormLabel>Condition of patient</FormLabel>
+                  <Select
+                    placeholder="Select option"
+                    name="condition"
+                    onChange={handleChange}
+                  >
+                    <option value="stable">stable</option>
+                    <option value="intermediate">intermediate</option>
+                    <option value="critical">critical</option>
+                  </Select>
+                </FormControl>
+                <Button colorScheme="blue" mr={3} mt="1rem" type="submit">
+                  Save
+                </Button>
+              </form>
+            </ModalBody>
+
+            <ModalFooter>
+              <Button onClick={onClose}>Cancel</Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div
           style={{
             width: "50vw",
             padding: "10px",
+            margin: "auto",
+            padding: "1rem",
           }}
         >
           {blogData?.map((item) => (
@@ -178,16 +236,11 @@ export default function Blogs() {
               {edit && selectedId === item._id ? (
                 <div>
                   <textarea
-                    style={{ height: "2vh" }}
-                    value={update.title}
-                    name="title"
-                    onChange={(e) => handleTextArea("title", e.target.value)}
-                  ></textarea>
-                  <br />
-                  <textarea
-                    value={update.body}
-                    name="body"
-                    onChange={(e) => handleTextArea("body", e.target.value)}
+                    value={update.patient_details}
+                    name="patient_details"
+                    onChange={(e) =>
+                      handleTextArea("patient_details", e.target.value)
+                    }
                   ></textarea>
                   <br />
                   <Button
@@ -219,7 +272,12 @@ export default function Blogs() {
                 </span>{" "}
                 {item.blood_type}
               </li>
-
+              <li>
+                <span style={{ fontWeight: "bold", fontSize: "18px" }}>
+                  Patient Condition:{" "}
+                </span>{" "}
+                {item.condition}
+              </li>
               <Button
                 cursor={"pointer"}
                 onClick={() => {

@@ -128,7 +128,7 @@ const Register = () => {
                     <Input
                       type={showPassword ? "text" : "password"}
                       name="pass"
-                      value={formState.password}
+                      value={formState.pass}
                       onChange={handleChange}
                     />
                     <InputRightElement h={"full"}>

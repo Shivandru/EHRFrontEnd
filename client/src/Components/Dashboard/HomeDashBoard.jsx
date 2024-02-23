@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Flex, Box } from "@chakra-ui/react";
 import {
   BarChart,
@@ -14,50 +14,29 @@ import {
   Line,
 } from "recharts";
 const HomeDashBoard = () => {
-  const data = [
-    {
-      name: "Page A",
-      uv: 4000,
-      pv: 2400,
-      amt: 2400,
-    },
-    {
-      name: "Page B",
-      uv: 3000,
-      pv: 1398,
-      amt: 2210,
-    },
-    {
-      name: "Page C",
-      uv: 2000,
-      pv: 9800,
-      amt: 2290,
-    },
-    {
-      name: "Page D",
-      uv: 2780,
-      pv: 3908,
-      amt: 2000,
-    },
-    {
-      name: "Page E",
-      uv: 1890,
-      pv: 4800,
-      amt: 2181,
-    },
-    {
-      name: "Page F",
-      uv: 2390,
-      pv: 3800,
-      amt: 2500,
-    },
-    {
-      name: "Page G",
-      uv: 3490,
-      pv: 4300,
-      amt: 2100,
-    },
-  ];
+  const [patientData, setPatientData] = useState([]);
+  const [aggData, setAggData] = useState([]);
+  const [conditionData, setConditionData] = useState([]);
+  async function getData() {
+    try {
+      const res = await fetch(`http://localhost:3000/record`, {
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+      });
+      const data = await res.json();
+      setPatientData(data.data);
+      setAggData(data.aggregatedData);
+      setConditionData(data.aggregatedConditionData);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  useEffect(() => {
+    getData();
+  }, []);
+  // console.log(patientData);
+  console.log(conditionData);
   return (
     <>
       <Flex w="100%" justify={"space-evenly"} p="1rem" pt="2rem" mt="2rem">
@@ -81,7 +60,7 @@ const HomeDashBoard = () => {
           justify={"center"}
           cursor={"pointer"}
           align={"center"}
-          fontSize={"1.5rem"}
+          fontSize={["0.9rem", "1.5rem"]}
         >
           Intermediate
         </Flex>
@@ -104,7 +83,7 @@ const HomeDashBoard = () => {
             <BarChart
               width={500}
               height={300}
-              data={data}
+              data={aggData}
               margin={{
                 top: 5,
                 right: 30,
@@ -113,12 +92,12 @@ const HomeDashBoard = () => {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="category" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="pv" fill="#8884d8" />
-              <Bar dataKey="uv" fill="#82ca9d" />
+              <Bar dataKey="value" fill="#8884d8" />
+              <Bar dataKey="gender" fill="#82ca9d" />
             </BarChart>
           </ResponsiveContainer>
         </Box>
@@ -127,7 +106,7 @@ const HomeDashBoard = () => {
             <LineChart
               width={500}
               height={300}
-              data={data}
+              data={conditionData}
               margin={{
                 top: 5,
                 right: 30,
@@ -136,17 +115,21 @@ const HomeDashBoard = () => {
               }}
             >
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
+              <XAxis dataKey="category" />
               <YAxis />
               <Tooltip />
               <Legend />
               <Line
                 type="monotone"
-                dataKey="pv"
+                dataKey="value"
                 stroke="#8884d8"
                 activeDot={{ r: 8 }}
               />
-              <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+              <Line
+                type="monotone"
+                dataKey="patient-condition"
+                stroke="#82ca9d"
+              />
             </LineChart>
           </ResponsiveContainer>
         </Box>
