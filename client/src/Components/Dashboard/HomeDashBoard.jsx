@@ -19,11 +19,14 @@ const HomeDashBoard = () => {
   const [conditionData, setConditionData] = useState([]);
   async function getData() {
     try {
-      const res = await fetch(`http://localhost:3000/record`, {
-        method: "GET",
-        mode: "cors",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `https://backendehr-production.up.railway.app/record`,
+        {
+          method: "GET",
+          mode: "cors",
+          credentials: "include",
+        }
+      );
       const data = await res.json();
       setPatientData(data.data);
       setAggData(data.aggregatedData);
