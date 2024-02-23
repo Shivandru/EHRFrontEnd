@@ -3,11 +3,14 @@ import { Link } from "react-router-dom";
 import AllRoutes from "../AllRoutesFolder/AllRoutes";
 export default function Navbar() {
   async function handleLogout() {
-    let res = await fetch(`http://localhost:3000/user/logout`, {
-      method: "GET",
-      mode: "cors",
-      credentials: "include",
-    });
+    let res = await fetch(
+      `https://backendehr-production.up.railway.app/user/logout`,
+      {
+        method: "GET",
+        mode: "cors",
+        credentials: "include",
+      }
+    );
     let data = await res.json();
     alert(data.msg);
   }

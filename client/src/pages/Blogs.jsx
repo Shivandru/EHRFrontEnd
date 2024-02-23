@@ -219,7 +219,7 @@ export default function Blogs() {
         <div
           style={{
             width: "50vw",
-            padding: "10px",
+            // padding: "10px",
             margin: "auto",
             padding: "1rem",
           }}

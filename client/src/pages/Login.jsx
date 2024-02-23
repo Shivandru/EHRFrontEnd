@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { handleLogin } from "../Redux/Actions";
 import {
   Box,
   Flex,
@@ -21,6 +23,7 @@ const Login = () => {
     setLogin({ ...login, [e.target.name]: e.target.value });
   };
   async function handleSubmit(e) {
+    const dispatch = useDispatch();
     try {
       e.preventDefault();
       const res = await fetch(
@@ -37,6 +40,7 @@ const Login = () => {
       );
       const data = await res.json();
       if (data.msg === "Login Successful") {
+        dispatch(handleLogin());
         toast({
           title: "Logged In",
           description: "You Logged in Successfully",
